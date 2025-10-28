@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>✨ Checkout Time Calculator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #fff;
+      animation: gradientBG 12s ease infinite;
+      background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #a1c4fd, #c2e9fb);
+      background-size: 400% 400%;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .calculator {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border-radius: 1.8rem;
+      padding: 2.8rem;
+      width: 330px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      animation: fadeIn 1.5s ease forwards;
+      transform: translateY(10px);
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #fff;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
+
+    label {
+      display: block;
+      font-size: 1rem;
+      margin-top: 0.8rem;
+    }
+
+    input, select {
+      width: 85%;
+      margin-top: 0.5rem;
+      padding: 0.7rem;
+      border: none;
+      border-radius: 0.8rem;
+      text-align: center;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transition: all 0.3s ease;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.8rem 2rem;
+      border: none;
+      border-radius: 2rem;
+      background: linear-gradient(90deg, #ff758c, #ff7eb3, #fad0c4);
+      background-size: 200% 200%;
+      color: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      box-shadow: 0 4px 15px rgba(255, 120, 150, 0.4);
+      animation: glow 3s infinite ease-in-out;
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 15px #ff9a9e; }
+      50% { box-shadow: 0 0 25px #ff7eb3; }
+    }
+
+    button:hover {
+      background-position: right center;
+      transform: scale(1.07);
+    }
+
+    .result {
+      margin-top: 1.6rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+      line-height: 1.5;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    .clear-btn {
+      margin-top: 1rem;
+      background: linear-gradient(90deg, #89f7fe, #66a6ff);
+      animation: glowBlue 3s infinite ease-in-out;
+    }
+
+    @keyframes glowBlue {
+      0%, 100% { box-shadow: 0 0 15px #89f7fe; }
+      50% { box-shadow: 0 0 25px #66a6ff; }
+    }
+
+    footer {
+      margin-top: 2rem;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+      text-align: center;
+      animation: fadeIn 2s ease forwards;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <h2>🕒 Checkout Time Calculator</h2>
+
+    <label>Check-in Time:</label>
+    <input type="time" id="checkin" required>
+
+    <label>Duration:</label>
+    <select id="duration">
+      <option value="8.5">Full Day (8 hrs 30 mins)</option>
+      <option value="4.5">Half Day (4 hrs 30 mins)</option>
+    </select>
+
+    <button onclick="calculateCheckout()">Calculate Checkout</button>
+    <button class="clear-btn" onclick="clearData()">Clear Memory</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  
+
+  <script>
+    function calculateCheckout() {
+      const checkin = document.getElementById('checkin').value;
+      const duration = parseFloat(document.getElementById('duration').value);
+      const result = document.getElementById('result');
+  
+      if (!checkin) {
+        result.innerText = "⚠️ Please enter a check-in time!";
+        return;
+      }
+  
+      const now = new Date();
+      const [checkinHour, checkinMinute] = checkin.split(':').map(Number);
+      const checkinDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), checkinHour, checkinMinute);
+  
+      const totalMinutes = Math.round(duration * 60);
+      const checkoutDate = new Date(checkinDate.getTime() + totalMinutes * 60000);
+  
+      // Date format
+      const options = { day: '2-digit', month: 'short', year: 'numeric' };
+      const checkinDateText = checkinDate.toLocaleDateString('en-GB', options);
+      const checkoutDateText = checkoutDate.toLocaleDateString('en-GB', options);
+  
+      // Time formatting for check-in
+      const checkinHours12 = (checkinDate.getHours() % 12) || 12;
+      const checkinMinutes = checkinDate.getMinutes().toString().padStart(2, '0');
+      const checkinAmpm = checkinDate.getHours() >= 12 ? 'PM' : 'AM';
+  
+      // Time formatting for checkout
+      const checkoutHours = checkoutDate.getHours();
+      const checkoutMinutes = checkoutDate.getMinutes().toString().padStart(2, '0');
+      const ampm = checkoutHours >= 12 ? 'PM' : 'AM';
+      const displayHour = (checkoutHours % 12) || 12;
+  
+      const checkoutText = `✅ Check-in: ${checkinDateText} at ${checkinHours12}:${checkinMinutes} ${checkinAmpm}
+  🕒 Checkout: ${checkoutDateText} at ${displayHour}:${checkoutMinutes} ${ampm}`;
+      
+      result.innerText = checkoutText;
+  
+      // Save in localStorage
+      localStorage.setItem('checkinTime', checkin);
+      localStorage.setItem('duration', duration);
+      localStorage.setItem('checkoutResult', checkoutText);
+    }
+  
+    function clearData() {
+      localStorage.clear();
+      document.getElementById('checkin').value = '';
+      document.getElementById('duration').value = '8.5';
+      document.getElementById('result').innerText = '🗑️ Memory cleared!';
+    }
+  
+    window.onload = function() {
+      const savedCheckin = localStorage.getItem('checkinTime');
+      const savedDuration = localStorage.getItem('duration');
+      const savedResult = localStorage.getItem('checkoutResult');
+  
+      if (savedCheckin) document.getElementById('checkin').value = savedCheckin;
+      if (savedDuration) document.getElementById('duration').value = savedDuration;
+      if (savedResult) document.getElementById('result').innerText = savedResult;
+    };
+  </script>
+  
+</body>
+</html>
+
